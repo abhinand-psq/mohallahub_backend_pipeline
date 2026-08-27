@@ -45,6 +45,14 @@ if (ward) ward = ward.trim().toLowerCase();
       return res.status(400).json({ success: false, error: { message: "Missing required fields" } });
     }
 
+    if(password.length < 8){
+      return res.status(400).json({ success: false, error: { message: "Password must be at least 8 characters long" } });
+    }
+
+    if(!state?.trim() || !district?.trim() || !taluk?.trim() || !block?.trim() || !panchayath?.trim()){
+      return res.status(400).json({ success: false, error: { message: "Incomplete location data" } });
+    }
+
     // check duplicates
     const exists = await User.findOne({ $or: [{ email: email.toLowerCase() }, { username }] });
     if (exists) {
@@ -191,6 +199,9 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } =req.body;
     console.log(req.body);
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: { message: "Email and password are required" } });
+    }
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -198,6 +209,10 @@ export const login = async (req, res, next) => {
     }
     if (user.status === "banned") {
       return res.status(403).json({ success: false, error: { message: "User banned" } });
+    }
+
+    if (!user.passwordHash) {
+      return res.status(401).json({ success: false, error: { message: "Invalid credentials" } });
     }
 
     const ok = await bcrypt.compare(password, user.passwordHash);
