@@ -1,0 +1,1 @@
+"start": "node --watch src/server.js"
