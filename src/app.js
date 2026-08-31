@@ -28,6 +28,8 @@ import servicesRoutes from "./routes/services.routes.js";
 import userAuction from "./routes/auction.user.route.js"
 import locationRoutes from "./routes/location.routes.js"
 import communityAdminRoutes from "./routes/community.admin.routes.js"
+import mongoose from 'mongoose';
+import connectDB from './config/db.js';
 
 
 dotenv.config();
@@ -92,6 +94,36 @@ app.get('/api/v1/health', (req, res) => {
     message: 'MohallaHub Backend is running',
     timestamp: new Date().toISOString()
   });
+});
+
+app.get('/api/v1/startup', (req, res) => {
+  res.status(200).json({
+    status: 'STARTED',
+    message: 'MohallaHub backend server has started'
+  });
+});
+
+app.get("/api/v1/ready", async (req, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+
+    const collections =
+      await mongoose.connection.db.listCollections().toArray();
+
+    res.status(200).json({
+      success: true,
+      server: "running",
+      database: "connected",
+      collections: collections.map((collection) => collection.name)
+    });
+
+  } catch (err) {
+    res.status(503).json({
+      success: false,
+      server: "running",
+      database: "disconnected"
+    });
+  }
 });
 
 // app.get('/api/v1/get-address',async(req,res)=>{
