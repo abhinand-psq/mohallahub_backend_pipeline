@@ -5,7 +5,7 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies first for Docker layer caching
+# Install dependencies first for better layer caching
 COPY package*.json ./
 
 RUN npm ci
@@ -13,9 +13,9 @@ RUN npm ci
 # Copy application source
 COPY . .
 
-# Production API configuration
-ARG VITE_ENV=production
-ARG VITE_BACKEND_API_URL=http://abhi.app.local/api/v1
+# Supplied during Docker build by Jenkins
+ARG VITE_ENV
+ARG VITE_BACKEND_API_URL
 
 ENV VITE_ENV=${VITE_ENV}
 ENV VITE_BACKEND_API_URL=${VITE_BACKEND_API_URL}
@@ -25,20 +25,16 @@ RUN npm run build
 
 
 # =========================
-# Stage 2: Nginx
+# Stage 2: Unprivileged Nginx
 # =========================
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 
-# Remove default nginx configuration
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Our React SPA nginx configuration
+# Copy our React SPA configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy React production files
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
-

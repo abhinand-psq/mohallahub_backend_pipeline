@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+
+data:
+  CLOUDINARY_API_KEY: "<your-cloudinary-api-key>"
+  CLOUDINARY_API_SECRET: "<your-cloudinary-api-secret>"
+  CLOUDINARY_CLOUD_NAME: "<your-cloudinary-cloud-name>"
+
+  JWT_EXPIRE: "15m"
+  JWT_SECRET: "<your-jwt-secret>"
+
+  MAX_PRODUCTS_PER_SHOP: "20"
+  MAX_SHOPS_PER_USER: "3"
+
+  MONGO_URI: "<your-mongodb-uri>"
+
+  NODE_ENV: "production"
+
+  REFRESH_TOKEN_EXPIRE: "7d"
+  REFRESH_TOKEN_SECRET: "<your-refresh-token-secret>"
+
+  SHOP_MIN_MEMBERSHIP_DAYS: "7"
+
+  PORT: "8000"

@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend
+  labels:
+    app: backend
+
+spec:
+  replicas: 1
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: backend
+
+          image: <AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/mohallahub-backend:1
+
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+
+          # Environment variables from ConfigMap
+          env:
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: CLOUDINARY_API_KEY
+
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: CLOUDINARY_API_SECRET
+
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: CLOUDINARY_CLOUD_NAME
+
+            - name: JWT_EXPIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: JWT_EXPIRE
+
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: JWT_SECRET
+
+            - name: MAX_PRODUCTS_PER_SHOP
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MAX_PRODUCTS_PER_SHOP
+
+            - name: MAX_SHOPS_PER_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MAX_SHOPS_PER_USER
+
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MONGO_URI
+
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: NODE_ENV
+
+            - name: REFRESH_TOKEN_EXPIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: REFRESH_TOKEN_EXPIRE
+
+            - name: REFRESH_TOKEN_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: REFRESH_TOKEN_SECRET
+
+            - name: SHOP_MIN_MEMBERSHIP_DAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: SHOP_MIN_MEMBERSHIP_DAYS
+
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: PORT
+
+          # Resource requests and limits
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          # Container security
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+
+          # Application startup check
+          startupProbe:
+            httpGet:
+              path: /api/v1/startup
+              port: 8000
+            failureThreshold: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+
+          # Application liveness check
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          # Application + MongoDB readiness check
+          readinessProbe:
+            httpGet:
+              path: /api/v1/ready
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

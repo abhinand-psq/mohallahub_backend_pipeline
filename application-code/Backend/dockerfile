@@ -22,5 +22,8 @@ COPY . .
 # Backend listens on port 8000
 EXPOSE 8000
 
+# Run the application as the non-root node user
+USER node
+
 # Start the backend
 CMD ["npm", "start"]
