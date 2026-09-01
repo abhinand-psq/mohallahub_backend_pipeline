@@ -28,7 +28,7 @@ spec:
       containers:
         - name: frontend-app
 
-          image: abhinandp123/frontend_app:1.0
+          image: abhinandp123/frontend:2.0
 
           ports:
             - containerPort: 8080

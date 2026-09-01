@@ -28,13 +28,14 @@ spec:
       containers:
         - name: backend
 
-          image: <AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/mohallahub-backend:1
+          image: abhinandp123/backend-app:2.2
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 8000
               protocol: TCP
 
-          # Environment variables from ConfigMap
+          # Environment variables
           env:
             - name: CLOUDINARY_API_KEY
               valueFrom:
@@ -119,43 +120,48 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+
             limits:
               cpu: 500m
               memory: 512Mi
 
           # Container security
           securityContext:
-            runAsNonRoot: true
             allowPrivilegeEscalation: false
+
             capabilities:
               drop:
                 - ALL
+
             seccompProfile:
               type: RuntimeDefault
 
-          # Application startup check
+          # Startup probe
           startupProbe:
             httpGet:
               path: /api/v1/startup
               port: 8000
+
             failureThreshold: 30
             periodSeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 4
 
-          # Application liveness check
+          # Liveness probe
           livenessProbe:
             httpGet:
               path: /api/v1/health
               port: 8000
+
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 3
 
-          # Application + MongoDB readiness check
+          # Readiness probe
           readinessProbe:
             httpGet:
               path: /api/v1/ready
               port: 8000
+
             periodSeconds: 10
-            timeoutSeconds: 3
+            timeoutSeconds: 5
             failureThreshold: 3
