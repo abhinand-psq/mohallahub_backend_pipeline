@@ -185,8 +185,8 @@ pipeline {
                               "s|^[[:space:]]*image: .*|          image: ${IMAGE_URI}|" \
                               backend-deployment.yaml
 
-                            git config user.email "jenkins@local"
-                            git config user.name "Jenkins"
+                            git config user.email "abhinandpsq2@gmail.com"
+                            git config user.name "abhinand-psq"
 
                             git add backend-deployment.yaml
 
