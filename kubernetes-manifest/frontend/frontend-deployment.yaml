@@ -28,7 +28,7 @@ spec:
       containers:
         - name: frontend-app
 
-          image: abhinandp123/frontend:2.0
+          image: 503026942664.dkr.ecr.ap-south-1.amazonaws.com/mohalla-frontend:2
 
           ports:
             - containerPort: 8080
