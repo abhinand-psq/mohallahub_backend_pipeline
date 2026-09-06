@@ -64,8 +64,9 @@ pipeline {
                 dir('application-code/Frontend') {
 
                     dependencyCheck(
-                        additionalArguments: '--scan . --disableYarnAudit --disableNodeAudit',
-                        odcInstallation: 'DP-Check'
+                        odcInstallation: 'DP-Check',
+                        nvdCredentialsId: 'nvd-api-key',
+                        additionalArguments: '--scan . --disableYarnAudit --disableNodeAudit'
                     )
 
                     dependencyCheckPublisher(
