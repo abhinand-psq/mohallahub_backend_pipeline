@@ -28,7 +28,7 @@ spec:
       containers:
         - name: backend
 
-          image: abhinandp123/backend-app:2.2
+          image: 503026942664.dkr.ecr.ap-south-1.amazonaws.com/mohalla-backend:13
           imagePullPolicy: IfNotPresent
 
           ports:
