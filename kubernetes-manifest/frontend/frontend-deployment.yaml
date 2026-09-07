@@ -27,7 +27,7 @@ spec:
 
     spec:
       imagePullSecrets:
-        - name: <YOUR-ECR-SECRET-NAME>
+        - name: ecr-secret
 
       containers:
         - name: frontend-app
