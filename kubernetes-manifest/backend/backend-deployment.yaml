@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: backend
+  namespace: three-tier
   labels:
     app: backend
 
@@ -25,6 +26,9 @@ spec:
         app: backend
 
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
+
       containers:
         - name: backend
 
@@ -35,7 +39,6 @@ spec:
             - containerPort: 8000
               protocol: TCP
 
-          # Environment variables
           env:
             - name: CLOUDINARY_API_KEY
               valueFrom:
@@ -115,7 +118,6 @@ spec:
                   name: backend-config
                   key: PORT
 
-          # Resource requests and limits
           resources:
             requests:
               cpu: 100m
@@ -125,7 +127,6 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-          # Container security
           securityContext:
             allowPrivilegeEscalation: false
 
@@ -136,7 +137,6 @@ spec:
             seccompProfile:
               type: RuntimeDefault
 
-          # Startup probe
           startupProbe:
             httpGet:
               path: /api/v1/startup
@@ -146,7 +146,6 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 4
 
-          # Liveness probe
           livenessProbe:
             httpGet:
               path: /api/v1/health
@@ -156,7 +155,6 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 3
 
-          # Readiness probe
           readinessProbe:
             httpGet:
               path: /api/v1/ready
