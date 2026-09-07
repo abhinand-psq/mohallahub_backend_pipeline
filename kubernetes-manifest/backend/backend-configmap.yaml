@@ -6,22 +6,22 @@ metadata:
   namespace: three-tier
 
 data:
-  CLOUDINARY_API_KEY: "<your-cloudinary-api-key>"
-  CLOUDINARY_API_SECRET: "<your-cloudinary-api-secret>"
-  CLOUDINARY_CLOUD_NAME: "<your-cloudinary-cloud-name>"
+  CLOUDINARY_API_KEY: "773959335787321"
+  CLOUDINARY_API_SECRET: "UBpQstDBygSMHXL39sy5FdZBs_U"
+  CLOUDINARY_CLOUD_NAME: "dwvjs0h95"
 
   JWT_EXPIRE: "15m"
-  JWT_SECRET: "<your-jwt-secret>"
+  JWT_SECRET: "supersecuresecret"
 
   MAX_PRODUCTS_PER_SHOP: "20"
   MAX_SHOPS_PER_USER: "3"
 
-  MONGO_URI: "<your-mongodb-uri>"
+  MONGO_URI: "mongodb+srv://forudemy:udemy123@cluster0.cllrp.mongodb.net/?appName=Cluster0"
 
   NODE_ENV: "production"
 
   REFRESH_TOKEN_EXPIRE: "7d"
-  REFRESH_TOKEN_SECRET: "<your-refresh-token-secret>"
+  REFRESH_TOKEN_SECRET: "refreshsupersecret"
 
   SHOP_MIN_MEMBERSHIP_DAYS: "7"
 
