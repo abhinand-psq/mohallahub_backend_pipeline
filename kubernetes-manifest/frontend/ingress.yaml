@@ -1,7 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
+
 metadata:
   name: frontend-ingress
+  namespace: three-tier
 
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
