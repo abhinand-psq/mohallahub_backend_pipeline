@@ -3,6 +3,7 @@ kind: Service
 
 metadata:
   name: backend-service
+  namespace: three-tier
 
 spec:
   type: ClusterIP
