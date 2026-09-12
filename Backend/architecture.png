@@ -1,0 +1,35 @@
+## 9. Containerization Flow
+
+The complete backend flow is:
+
+``` text
+Mohalla Backend source
+        |
+        v
+Docker build
+        |
+        +--> Stage 1: Node 20 Alpine
+        |       |
+        |       +--> copy package files
+        |       +--> npm ci --omit=dev
+        |       |
+        |       +--> production node_modules
+        |
+        v
+Stage 2: Node 20 Alpine
+        |
+        +--> copy production node_modules
+        +--> copy application source
+        +--> create /app/logs
+        +--> change ownership
+        +--> switch to node user
+        |
+        v
+npm start
+        |
+        v
+Backend listening on :8000
+        |
+        v
+Kubernetes Service
+```

@@ -1,0 +1,33 @@
+## Containerization Flow
+
+The complete frontend flow is:
+
+``` text
+Mohalla React source
+        |
+        v
+Docker build
+        |
+        +--> Stage 1: Node 20 Alpine
+        |       |
+        |       +--> npm ci
+        |       +--> receive VITE_* build arguments
+        |       +--> npm run build
+        |       |
+        |       +--> /app/dist
+        |
+        v
+Stage 2: Nginx Unprivileged
+        |
+        +--> copy /app/dist
+        +--> copy nginx.conf
+        |
+        v
+Nginx listening on :8080
+        |
+        v
+Kubernetes Service / Ingress
+        |
+        v
+Browser
+```

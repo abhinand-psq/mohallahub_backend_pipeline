@@ -1,273 +1,209 @@
-# MohallaHub Backend
+# Mohalla Backend --- Dockerization Documentation
 
-**Version:** 1.0  
-**Type:** Production-Grade Hyperlocal Community Platform Backend  
-**Stack:** Node.js (Express) + MongoDB (Mongoose) + JWT + Multer + Cloudinary
+## 1. Overview
 
+The Mohalla backend is a Node.js application that is containerized using
+a **two-stage Docker build**.
+
+The Dockerfile separates:
+
+1.  **Dependency stage** --- installs the production Node.js
+    dependencies.
+2.  **Runtime stage** --- starts from a fresh Node.js Alpine image and
+    copies only the required production dependencies and application
+    source.
+
+The container listens on port **8000**.
 ---
 
-## 📋 Overview
+## 3. Stage 1 --- Production Dependencies
 
-MohallaHub is a hyperlocal community platform connecting users within a defined geographic hierarchy:
-**State → District → Taluk → Block → Gram Panchayath → Ward**
+The first stage is:
 
-Each geographic unit hosts multiple communities for local discussions, events, posts, and micro-commerce.
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- MongoDB (local or MongoDB Atlas)
-- Cloudinary account
-- Git
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd mohallahub-backend
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` and add your configurations:
-   - `MONGO_URI` - MongoDB connection string
-   - `JWT_SECRET` - Secret for access tokens
-   - `JWT_REFRESH_SECRET` - Secret for refresh tokens
-   - `CLOUDINARY_*` - Cloudinary credentials
-   - `FRONTEND_URL` - Frontend application URL
-
-4. **Start the server**
-   ```bash
-   npm start
-   ```
-   For development with auto-reload:
-   ```bash
-   npm run dev
-   ```
-
-5. **Verify the installation**
-   Visit `http://localhost:8000/api/health`
-
-## 📁 Project Structure
-
-```
-mohallahub-backend/
-├── src/
-│   ├── config/
-│   │   ├── db.js                 # MongoDB connection
-│   │   └── cloudinary.js         # Cloudinary setup
-│   │
-│   ├── models/                   # Mongoose schemas
-│   │   ├── Ward.js
-│   │   ├── User.js
-│   │   ├── Community.js
-│   │   ├── Post.js
-│   │   ├── Comment.js
-│   │   ├── Like.js
-│   │   ├── Follow.js
-│   │   ├── Notification.js
-│   │   ├── Report.js
-│   │   ├── RefreshToken.js
-│   │   └── Admin.js
-│   │
-│   ├── controllers/              # Business logic
-│   │   ├── authController.js
-│   │   ├── userController.js
-│   │   ├── communityController.js
-│   │   ├── postController.js
-│   │   └── commentController.js
-│   │
-│   ├── routes/                   # Express routes
-│   │   ├── authRoutes.js
-│   │   ├── userRoutes.js
-│   │   ├── communityRoutes.js
-│   │   ├── postRoutes.js
-│   │   └── commentRoutes.js
-│   │
-│   ├── middleware/               # Custom middleware
-│   │   ├── auth.js
-│   │   ├── upload.js
-│   │   └── logger.js
-│   │
-│   ├── utils/                    # Helper functions
-│   │   ├── tokenHelpers.js
-│   │   └── cloudinaryHelpers.js
-│   │
-│   ├── app.js                    # Express app configuration
-│   └── server.js                 # Server entry point
-│
-├── logs/                         # Application logs
-├── .env                          # Environment variables
-├── .env.example                  # Environment template
-├── package.json
-└── README.md
+``` dockerfile
+FROM node:20-alpine AS dependencies
 ```
 
-## 🔑 API Endpoints
+The working directory is:
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `POST /api/auth/refresh-token` - Refresh access token
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/me` - Get current user
-
-### Users
-- `GET /api/users/search?q=<query>` - Search users
-- `GET /api/users/:username` - Get user profile
-- `GET /api/users/:username/posts` - Get user's posts
-- `PUT /api/users/profile` - Update profile
-- `POST /api/users/:userId/follow` - Follow user
-- `DELETE /api/users/:userId/follow` - Unfollow user
-
-### Communities
-- `GET /api/communities/search?q=<query>&hierarchy=<hierarchy>` - Search communities
-- `GET /api/communities/:id` - Get community details
-- `GET /api/communities/:id/posts` - Get community posts
-- `POST /api/communities` - Create community
-- `POST /api/communities/:id/join` - Join community
-- `DELETE /api/communities/:id/leave` - Leave community
-
-### Posts
-- `GET /api/posts/feed` - Get feed
-- `GET /api/posts/:id` - Get post details
-- `POST /api/posts` - Create post
-- `POST /api/posts/:id/like` - Like post
-- `DELETE /api/posts/:id/like` - Unlike post
-- `POST /api/posts/:id/save` - Save post
-- `DELETE /api/posts/:id/save` - Unsave post
-- `DELETE /api/posts/:id` - Delete post
-
-### Comments
-- `GET /api/comments/post/:id` - Get comments for a post
-- `POST /api/comments/post/:id` - Create comment
-- `POST /api/comments/:id/like` - Like comment
-- `DELETE /api/comments/:id/like` - Unlike comment
-- `DELETE /api/comments/:id` - Delete comment
-
-## 🗄️ Database Models
-
-The application uses MongoDB with the following key collections:
-
-- **User** - User accounts and profiles
-- **Community** - Hyperlocal communities
-- **Post** - User-generated posts
-- **Comment** - Post comments (with threading support)
-- **Like** - Post and comment likes
-- **Follow** - User-to-user following relationships
-- **CommunityMembership** - User membership in communities
-- **Notification** - User notifications
-- **Report** - Content moderation reports
-- **RefreshToken** - JWT refresh tokens
-- **Ward** - Geographic hierarchy master data
-- **UserCommunityAccess** - Location references
-
-## 🔒 Authentication
-
-The application uses JWT with access tokens (15 minutes) and refresh tokens (7 days).
-
-- Include access token in headers: `Authorization: Bearer <token>`
-- Refresh tokens are stored in MongoDB and auto-expire after 7 days
-
-## 📤 File Uploads
-
-Media uploads are handled via Multer and stored in Cloudinary:
-
-- Profile pictures (jpeg, jpg, png, gif)
-- Post media (up to 3 files)
-- Video support included
-- File size limit: 10MB
-
-## 🛠️ Technology Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Runtime | Node.js |
-| Framework | Express.js |
-| Database | MongoDB with Mongoose |
-| File Storage | Cloudinary |
-| Authentication | JWT (Access + Refresh) |
-| File Upload | Multer |
-| Logging | Morgan + Winston |
-| Validation | express-validator |
-
-## 📝 Environment Variables
-
-Required environment variables (see `.env.example`):
-
-```env
-PORT=8000
-MONGO_URI=mongodb://localhost:27017/mohallahub
-JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-FRONTEND_URL=http://localhost:3000
+``` dockerfile
+WORKDIR /app
 ```
 
-## 🧪 Development
+Only the package definition files are initially copied:
 
-### Running in Development Mode
-```bash
-npm run dev
+``` dockerfile
+COPY package*.json ./
 ```
 
-### Project Commands
-- `npm start` - Start production server
-- `npm run dev` - Start development server with auto-reload
+The production dependencies are installed using:
 
-### Logging
-Logs are stored in the `logs/` directory:
-- `error.log` - Error logs
-- `combined.log` - All logs
+``` dockerfile
+RUN npm ci --omit=dev
+```
 
-## 🎯 Features Implemented
+### Why `npm ci`?
 
-✅ User registration and authentication  
-✅ Profile management with media uploads  
-✅ Community creation and management  
-✅ Post creation with media support  
-✅ Comments with threading  
-✅ Like/unlike posts and comments  
-✅ Follow/unfollow users  
-✅ Save posts  
-✅ Search users and communities  
-✅ Geographic hierarchy support  
-✅ JWT authentication with refresh tokens  
-✅ Cloudinary integration for media storage  
+`npm ci` performs a clean dependency installation based on the lock file
+when it is available. It is appropriate for repeatable container builds.
 
-## 📌 Future Enhancements
+### Why `--omit=dev`?
 
-- [ ] Notification system implementation
-- [ ] Report and moderation features
-- [ ] Admin panel endpoints
-- [ ] Analytics collection
-- [ ] Real-time features with WebSockets
-- [ ] Email verification
-- [ ] OAuth integration
+The production container does not need development-only packages.
 
-## 📄 License
+## 4. Stage 2 --- Runtime Image
 
-ISC
+The second stage starts again from:
 
-## 👤 Author
+``` dockerfile
+FROM node:20-alpine
+```
 
-Abhinand (Founder, MohallaHub)
+This becomes the final runtime image.
 
----
+The production dependencies created in the first stage are copied into
+it:
 
-For more information, please refer to the complete PRD document.
+``` dockerfile
+COPY --from=dependencies /app/node_modules ./node_modules
+```
+
+The application source is then copied:
+
+``` dockerfile
+COPY . .
+```
+
+The result is a runtime container containing the application and its
+production dependencies.
+
+## 5. Winston Log Directory
+
+The Dockerfile creates the directory required by the Winston logger:
+
+``` dockerfile
+RUN mkdir -p /app/logs
+```
+
+This ensures that the application has the expected directory available
+inside the container.
+
+## 6. Running as a Non-Root User
+
+The Dockerfile changes ownership:
+
+``` dockerfile
+RUN chown -R node:node /app
+```
+
+and then switches to the built-in Node user:
+
+``` dockerfile
+USER node
+```
+
+Therefore, the backend application process does not run as root.
+
+This is an important container-hardening measure because the application
+does not require root privileges for normal execution.
+
+## 7. Backend Port
+
+The Dockerfile declares:
+
+``` dockerfile
+EXPOSE 8000
+```
+
+This documents that the Node.js application listens on port:
+
+``` text
+8000
+```
+
+In Kubernetes, the Service can target this container port and expose the
+backend internally or through the required ingress architecture.
+
+## 8. Container Startup
+
+The container starts with:
+
+``` dockerfile
+CMD ["npm", "start"]
+```
+
+Therefore, the application's `package.json` `start` script is
+responsible for starting the backend server.
+
+The startup flow is:
+
+``` text
+Container starts
+      |
+      v
+npm start
+      |
+      v
+Node.js backend
+      |
+      v
+Listening on :8000
+```
 
 
+
+## 10. Why Multi-Stage Build?
+
+The dependency stage is used to isolate dependency installation from the
+final runtime stage.
+
+The final image receives the production dependencies through:
+
+``` dockerfile
+COPY --from=dependencies /app/node_modules ./node_modules
+```
+
+This follows the multi-stage Docker pattern: each stage has a specific
+responsibility and artifacts can be copied from an earlier stage into
+the final runtime image.
+
+Docker documents this approach as a way to separate build/dependency
+environments from runtime images and avoid carrying unnecessary build
+tooling into the final image.
+
+## 11. Security Characteristics
+
+The backend Dockerfile includes several useful practices:
+
+### Alpine base image
+
+``` dockerfile
+node:20-alpine
+```
+
+provides a relatively small Node.js base image.
+
+### Production-only dependencies
+
+``` dockerfile
+npm ci --omit=dev
+```
+
+avoids installing development dependencies in the dependency stage.
+
+### Non-root execution
+
+``` dockerfile
+USER node
+```
+
+runs the application without root privileges.
+
+### Explicit application port
+
+``` dockerfile
+EXPOSE 8000
+```
+
+documents the expected application port.
 
