@@ -1,33 +1,18 @@
 ## 1. Frontend and Backend Containerization Comparison
 
-  --------------------------------------------------------------------------------------
-  Area                    Frontend                               Backend
-  ----------------------- -------------------------------------- -----------------------
-  Application             React/Vite                             Node.js
-
-  Build stages            2                                      2
-
-  Builder base            `node:20-alpine`                       `node:20-alpine`
-
-  Main build operation    `npm run build`                        Production dependency
-                                                                 installation `npm ci --omit=dev`
-
-  Runtime base            `nginxinc/nginx-unprivileged:alpine`   `node:20-alpine`
-
-  Runtime process         Nginx                                  `npm start`
-
-  Port                    8080                                   8000
-
-  Runtime user            Unprivileged Nginx user                `node`
-
-  Special configuration   `nginx.conf`                           `/app/logs`
-
-  detailed explanation  ![frontend](./Frontend/README.md)    ![backend](./Backend/README.md)
-
-
-   environment    Build-time `VITE_*` arguments                 Application runtime
-                                                                 configuration. uses configmaps to pass variables to backend pods
-  --------------------------------------------------------------------------------------
+  | Area | Frontend | Backend |
+|--------|----------|---------|
+| Application | React / Vite | Node.js |
+| Build Stages | 2 | 2 |
+| Builder Base | `node:20-alpine` | `node:20-alpine` |
+| Main Build Operation | `npm run build` | `npm ci --omit=dev` |
+| Runtime Base | `nginxinc/nginx-unprivileged:alpine` | `node:20-alpine` |
+| Runtime Process | Nginx | `npm start` |
+| Port | 8080 | 8000 |
+| Runtime User | Unprivileged Nginx User | `node` |
+| Special Configuration | `nginx.conf` | `/app/logs` |
+| Environment Handling | Build-time `VITE_*` arguments | Runtime configuration via Kubernetes ConfigMaps |
+|Detailed Documentation | [Frontend Dockerization README](./Frontend/README.md) | [Backend Dockerization README](./Backend/README.md) |
 
 ## 2. Overall Mohalla Container Architecture
 
